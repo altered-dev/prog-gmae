@@ -28,8 +28,8 @@ public static class Drawer
 
 	public static (int x, int y) MazeToScreen(this Maze maze, int x, int y)
 	{
-		var dx = (int) ((x - (maze.Width / 2.0f)) * Config.CellSize);
-		var dy = (int) ((y - (maze.Height / 2.0f)) * Config.CellSize);
+		var dx = (int) ((x - (maze.Width / 2.0f) + 0.5f) * Config.CellSize);
+		var dy = (int) ((y - (maze.Height / 2.0f) + 0.5f) * Config.CellSize);
 		return (dx, dy);
 	}
 
