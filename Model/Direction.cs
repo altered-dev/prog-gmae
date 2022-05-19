@@ -1,4 +1,4 @@
-[Flags] public enum Direction
+public enum Direction
 { 
 	None = 0,
 	Right = 1, 

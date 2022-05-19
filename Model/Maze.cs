@@ -1,5 +1,3 @@
-using System.Linq;
-
 public class Maze
 {
 	public int Width { get; }
