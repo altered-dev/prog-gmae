@@ -21,7 +21,7 @@ public static class Extensions
 
 	public static Direction ToDirection(this Point pos)
 	{
-		var dir = default(Direction);
+		var dir = Direction.None;
 
 		if (pos.X < 0)
 			dir |= Direction.Left;
@@ -36,5 +36,7 @@ public static class Extensions
 		return dir;
 	}
 
-	public static T PickRandom<T>(this List<T> list) => list[new Random().Next(list.Count)];
+	private static readonly Random random = new();
+
+	public static T PickRandom<T>(this List<T> list) => list[random.Next(list.Count)];
 }

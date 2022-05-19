@@ -6,6 +6,7 @@ public class Maze
 	public int Height { get; }
 
 	public Cell[,] Cells { get; }
+	public Character Character { get; } = new();
 
 	public Maze(int width, int height)
 	{
@@ -30,7 +31,7 @@ public class Maze
 		while (visitedCount < width * height)
 		{
 			var emptyNeighbours = Config.PossibleDirections
-				.Select(d => new Point(current.Position.X + d.x, current.Position.X + d.y))
+				.Select(d => new Point(current.Position.X + d.Width, current.Position.Y + d.Height))
 				.Where(coord => 0 <= coord.X && coord.X < width && 0 <= coord.Y && coord.Y < height)
 				.Where(coord => cells[coord.X, coord.Y] == null)
 				.ToList();
@@ -51,7 +52,6 @@ public class Maze
 			next.Connections |= new Point(-dx, -dy).ToDirection();
 
 			cells[nextPosition.X, nextPosition.Y] = next;
-			
 			stack.Push(next);
 			visitedCount++;
 			current = next;
