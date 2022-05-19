@@ -52,7 +52,6 @@ while (!WindowShouldClose())
 		character.Position = (0, 0);
 	}
 
-
 	BeginDrawing();
 	BeginMode2D(camera);
 	ClearBackground(Color.WHITE);

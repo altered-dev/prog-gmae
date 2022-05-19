@@ -15,7 +15,7 @@ public static class Drawer
 		if ((cell.Connections & Direction.Up) == 0)
 			DrawLine(left, up, right, up, Color.BLACK);
 		if ((cell.Connections & Direction.Left) == 0)
-			DrawLine(left, up, left, down, Color.BLACK);
+			DrawLine(left, up - 1, left, down, Color.BLACK);
 		if ((cell.Connections & Direction.Down) == 0)
 			DrawLine(left, down, right, down, Color.BLACK);
 	}
