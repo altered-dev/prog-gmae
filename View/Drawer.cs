@@ -23,17 +23,25 @@ public static class Drawer
 		var left = pos.X - Config.CellSize / 2;
 		var down = pos.Y + Config.CellSize / 2;
 		if ((cell.Connections & Direction.Right) == 0)
-			DrawLine(right, up, right, down, Color.BLACK);
+			DrawLine(right, up, right, down, Color.LIGHTGRAY);
 		if ((cell.Connections & Direction.Up) == 0)
-			DrawLine(left, up, right, up, Color.BLACK);
+			DrawLine(left, up, right, up, Color.LIGHTGRAY);
 		if ((cell.Connections & Direction.Left) == 0)
-			DrawLine(left, up - 1, left, down, Color.BLACK);
+			DrawLine(left, up - 1, left, down, Color.LIGHTGRAY);
 		if ((cell.Connections & Direction.Down) == 0)
-			DrawLine(left, down, right, down, Color.BLACK);
+			DrawLine(left, down, right, down, Color.LIGHTGRAY);
 	}
 
 	public static void DrawCharacter(this Maze maze)
 	{
+		var previous = maze.MazeToScreen(maze.Character.Position);
+		var random = new Random();
+		foreach (var point in maze.Character.Trail.Select(p => maze.MazeToScreen(p)))
+		{
+			DrawLine(previous.X, previous.Y, point.X, point.Y, Color.DARKGREEN);
+			previous = point;
+		}
+
 		var pos = maze.MazeToScreen(maze.Character.Position);
 		DrawCircle(pos.X, pos.Y, Config.CellSize / 2 - 4, Color.GREEN);
 	}
