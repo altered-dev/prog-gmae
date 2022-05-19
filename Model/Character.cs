@@ -1,4 +1,6 @@
+using System.Drawing;
+
 public class Character
 {
-	public (int x, int y) Position { get; set; }
+	public Point Position { get; set; }
 }

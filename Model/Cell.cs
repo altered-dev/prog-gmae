@@ -1,8 +1,12 @@
+using System.Drawing;
+
 public class Cell 
 {
-	public (int x, int y) Position { get; }
+	public Point Position { get; }
 
 	public Direction Connections { get; set; }
 
-	public Cell(int x, int y) => Position = (x, y);
+	public Cell(Point position) => Position = position;
+
+	public Cell(int x, int y) => Position = new(x, y);
 }

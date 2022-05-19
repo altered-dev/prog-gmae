@@ -1,6 +1,8 @@
+using System.Drawing;
+
 public static class Extensions
 {
-	public static (int x, int y) ToCoords(this Direction direction)
+	public static Point ToCoords(this Direction direction)
 	{
 		var x = 0;
 		var y = 0;
@@ -14,21 +16,21 @@ public static class Extensions
 		if ((direction & Direction.Down) == Direction.Down)
 			y += 1;
 
-		return (x, y);
+		return new(x, y);
 	}
 
-	public static Direction ToDirection(this (int x, int y) pos)
+	public static Direction ToDirection(this Point pos)
 	{
 		var dir = default(Direction);
 
-		if (pos.x < 0)
+		if (pos.X < 0)
 			dir |= Direction.Left;
-		else if (pos.x > 0)
+		else if (pos.X > 0)
 			dir |= Direction.Right;
 		
-		if (pos.y < 0)
+		if (pos.Y < 0)
 			dir |= Direction.Up;
-		else if (pos.y > 0)
+		else if (pos.Y > 0)
 			dir |= Direction.Down;
 
 		return dir;

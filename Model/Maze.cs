@@ -1,3 +1,5 @@
+using System.Drawing;
+
 public class Maze
 {
 	public int Width { get; }
@@ -12,7 +14,7 @@ public class Maze
 		Cells = GenerateMaze(width, height);
 	}
 
-	public Cell this[(int x, int y) pos] => Cells[pos.x, pos.y];
+	public Cell this[Point pos] => Cells[pos.X, pos.Y];
 
 	private static Cell[,] GenerateMaze(int width, int height)
 	{
@@ -28,9 +30,9 @@ public class Maze
 		while (visitedCount < width * height)
 		{
 			var emptyNeighbours = Config.PossibleDirections
-				.Select(d => (x: current.Position.x + d.x, y: current.Position.y + d.y))
-				.Where(coord => 0 <= coord.x && coord.x < width && 0 <= coord.y && coord.y < height)
-				.Where(coord => cells[coord.x, coord.y] == null)
+				.Select(d => new Point(current.Position.X + d.x, current.Position.X + d.y))
+				.Where(coord => 0 <= coord.X && coord.X < width && 0 <= coord.Y && coord.Y < height)
+				.Where(coord => cells[coord.X, coord.Y] == null)
 				.ToList();
 			if (!emptyNeighbours.Any())
 			{
@@ -40,15 +42,16 @@ public class Maze
 				current = stack.Pop();
 				continue;
 			}
-			var (x, y) = emptyNeighbours.PickRandom<(int, int)>();
-			var next = new Cell(x, y);
-			var dx = x - current.Position.x;
-			var dy = y - current.Position.y;
+			var nextPosition = emptyNeighbours.PickRandom<Point>();
+			var next = new Cell(nextPosition);
+			var dx = nextPosition.X - current.Position.X;
+			var dy = nextPosition.Y - current.Position.Y;
 
-			current.Connections |= (dx, dy).ToDirection();
-			next.Connections |= (-dx, -dy).ToDirection();
+			current.Connections |= new Point(dx, dy).ToDirection();
+			next.Connections |= new Point(-dx, -dy).ToDirection();
 
-			cells[x, y] = next;
+			cells[nextPosition.X, nextPosition.Y] = next;
+			
 			stack.Push(next);
 			visitedCount++;
 			current = next;

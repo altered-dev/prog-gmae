@@ -34,8 +34,8 @@ public static class Drawer
 	}
 
 	public static (int x, int y) MazeToScreen(this Maze maze, Cell cell) => 
-		maze.MazeToScreen(cell.Position.x, cell.Position.y);
+		maze.MazeToScreen(cell.Position.X, cell.Position.Y);
 
 	public static (int x, int y) MazeToScreen(this Maze maze, Character character) =>
-		maze.MazeToScreen(character.Position.x, character.Position.y);
+		maze.MazeToScreen(character.Position.X, character.Position.Y);
 }
