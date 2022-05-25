@@ -7,17 +7,11 @@ public class Player
 
 	public LinkedList<Point> Tail { get; private set; } = new();
 
-	private static readonly Dictionary<Direction, Size> MoveDirections = new()
-	{
-		[Direction.Right] = new(1, 0),
-		[Direction.Up] = new(0, -1),
-		[Direction.Left] = new(-1, 0),
-		[Direction.Down] = new(0, 1)
-	};
+	public Player(Point startPosition) => Position = startPosition;
 
 	public void Move(Direction direction)
 	{ 
-		var newPos = Position + MoveDirections[direction];
+		var newPos = Position + direction.ToCoords();
 		if (Contains(newPos))
 			return;
 		Tail.AddFirst(Position);
@@ -31,12 +25,10 @@ public class Player
 	public void ChangeDirection()
 	{
 		Tail = new(Tail.Reverse());
-		if (Tail.First != null)
-		{
-			Tail.AddLast(Position);
-			Position = Tail.First.Value;
-			Tail.RemoveFirst();
-		}
-		Console.WriteLine();
+		if (Tail.First == null)
+			return;
+		Tail.AddLast(Position);
+		Position = Tail.First.Value;
+		Tail.RemoveFirst();
 	}
 }

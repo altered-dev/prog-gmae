@@ -6,7 +6,7 @@ public class Maze
 	public int Score { get; private set; }
 
 	private readonly Cell[,] cells;
-	public readonly Player Player = new();
+	public readonly Player Player = new(Point.Empty);
 	public readonly List<Teleport> Teleports = new();
 	public readonly List<Collectible> Collectibles = new();
 
@@ -17,7 +17,6 @@ public class Maze
 		Width = width < 1 ? 1 : width;
 		Height = height < 1 ? 1 : height;
 		cells = GenerateMaze(Width, Height);
-		Player.Position = new Point(random.Next(Width), random.Next(Height));
 		for (var i = 0; i < collectibleCount; i++)
 			AddCollectible();
 		for (var i = 0; i < teleportCount; i++)
@@ -28,69 +27,61 @@ public class Maze
 
 	public Cell this[Point pos] => cells[pos.X, pos.Y];
 
-	private void AddCollectible()
+	public bool IsInBounds(Point position) =>
+		0 <= position.X && position.X < Width &&
+		0 <= position.Y && position.Y < Height;
+
+	public bool IsCellOccupied(Point position, Player? player = null) => 
+		player?.Contains(position) ?? false ||
+		Collectibles.Any(c => c.Position == position) ||
+		Teleports.Any(t => t.Position == position);
+
+	public Point GetRandomFreePoint(Player? player = null)
 	{
-		Point position;
-		do position = new Point(random.Next(Width), random.Next(Height));
-		while (Player.Contains(position) 
-			|| Collectibles.Any(c => c.Position == position) 
-			|| Teleports.Any(t => t.Position == position));
-		Collectibles.Add(new(position));
+		Point result;
+		do result = new Point(random.Next(Width), random.Next(Height));
+		while (IsCellOccupied(result, player));
+		return result;
 	}
+
+	private void AddCollectible(Player? player = null) => Collectibles.Add(new(GetRandomFreePoint(player)));
 
 	private void AddTeleports()
 	{
-		// omg clutter
-		Point position;
-		do position = new Point(random.Next(Width), random.Next(Height));
-		while (Player.Contains(position)
-			|| Collectibles.Any(c => c.Position == position)
-			|| Teleports.Any(t => t.Position == position));
-		var teleportA = new Teleport(position);
+		var teleportA = new Teleport(GetRandomFreePoint());
+		var teleportB = new Teleport(GetRandomFreePoint());
 		Teleports.Add(teleportA);
-		do position = new Point(random.Next(Width), random.Next(Height));
-		while (Player.Contains(position)
-			|| Collectibles.Any(c => c.Position == position)
-			|| Teleports.Any(t => t.Position == position));
-		var teleportB = new Teleport(position);
 		Teleports.Add(teleportB);
 		teleportA.LinkTo(teleportB);
 	}
 
-	public void TryCollect(Point position)
+	public void TryCollect(Player player)
 	{
-		var collectible = Collectibles.Find(c => c.Position == position);
+		var collectible = Collectibles.Find(c => c.Position == player.Position);
 		if (collectible == null)
 			return;
 
 		Collectibles.Remove(collectible);
-		AddCollectible();
+		AddCollectible(player);
 		Score++;
-		Player.TailLength++;
+		player.TailLength++;
 	}
 
-	public void TryTeleport(Point position)
-	{
-		var teleport = Teleports.Find(t => t.Position == position);
-		if (teleport == null || teleport.Link == null || Player.Contains(teleport.Link.Position))
-			return;
-		Player.Position = teleport.Link.Position;
-	}
+	public void TryTeleportPlayer(Player player) => Teleports
+		.Find(t => t.Position == player.Position)?
+		.MovePlayer(player);
 
 	private static Cell[,] GenerateMaze(int width, int height)
 	{
 		var cells = new Cell[width, height];
-		var visitedCount = 0;
 		var stack = new Stack<Cell>();
-		cells[0, 0] = new Cell(0, 0);
-		stack.Push(cells[0, 0]);
+		var current = cells[0, 0] = new Cell(0, 0);
+		stack.Push(current);
 
-		var current = cells[0, 0];
-
-		while (visitedCount < width * height)
+		for (var visitedCount = 0; visitedCount < width * height;)
 		{
 			var emptyNeighbours = Config.PossibleDirections
-				.Select(d => new Point(current.Position.X + d.Width, current.Position.Y + d.Height))
+				.Select(d => current.Position + d)
 				.Where(coord => 0 <= coord.X && coord.X < width && 0 <= coord.Y && coord.Y < height)
 				.Where(coord => cells[coord.X, coord.Y] == null)
 				.ToList();

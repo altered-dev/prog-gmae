@@ -9,6 +9,10 @@ public static class Drawer
 		for (var x = 0; x < maze.Width; x++)
 		for (var y = 0; y < maze.Height; y++)
 			maze.DrawCell(x, y);
+		foreach (var collectible in maze.Collectibles)
+			maze.DrawCollectible(collectible);
+		foreach (var teleport in maze.Teleports)
+			maze.DrawTeleport(teleport);
 	}
 
 	public static void DrawCell(this Maze maze, int x, int y)
@@ -31,16 +35,16 @@ public static class Drawer
 			DrawLine(left, down, right, down, Color.LIGHTGRAY);
 	}
 
-	public static void DrawPlayer(this Maze maze)
+	public static void DrawPlayer(this Maze maze, Player player)
 	{
-		var previous = maze.MazeToScreen(maze.Player.Position);
+		var previous = maze.MazeToScreen(player.Position);
 		var random = new Random();
 		var i = 0;
 		var size = Config.CellSize / 3;
-		foreach (var point in maze.Player.Tail.Select(p => maze.MazeToScreen(p)))
-			DrawCircle(point.X, point.Y, size - (i++ * 5) / maze.Player.Tail.Count, Color.GREEN);
+		foreach (var point in player.Tail.Select(p => maze.MazeToScreen(p)))
+			DrawCircle(point.X, point.Y, size - (i++ * 5) / player.Tail.Count, Color.GREEN);
 
-		var pos = maze.MazeToScreen(maze.Player.Position);
+		var pos = maze.MazeToScreen(player.Position);
 		DrawCircle(pos.X, pos.Y, Config.CellSize / 2 - 4, Color.GREEN);
 	}
 

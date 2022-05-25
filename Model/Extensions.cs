@@ -1,8 +1,9 @@
 using System.Drawing;
+using Raylib_cs;
 
 public static class Extensions
 {
-	public static Point ToCoords(this Direction direction)
+	public static Size ToCoords(this Direction direction)
 	{
 		var x = 0;
 		var y = 0;
@@ -39,4 +40,11 @@ public static class Extensions
 	private static readonly Random random = new();
 
 	public static T PickRandom<T>(this List<T> list) => list[random.Next(list.Count)];
+
+	public static void ProcessInput<T>(this Dictionary<KeyboardKey, T> mapping, Action<T> action)
+	{
+		foreach (var (key, value) in mapping)
+			if (Raylib.IsKeyPressed(key))
+				action(value);
+	}
 }

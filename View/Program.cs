@@ -6,58 +6,65 @@ using Color = Raylib_cs.Color;
 #region initialization
 
 InitWindow(Config.WindowWidth, Config.WindowHeight, Config.WindowName);
+
 var camera = new Camera2D(Config.WindowCenter, Vector2.Zero, 0f, 1f);
-var maze = new Maze(16, 16, 5, 2);
+var maze = new Maze(Config.InitialWidth, Config.InitialHeight, 
+	Config.CollectibleCount, Config.TeleportCount);
+var player = new Player(maze.GetRandomFreePoint());
 var directions = Config.WalkDirections.Values.ToList();
 
 #endregion
 
-#region main game loop
-
-while (!WindowShouldClose())
+void Input()
 {
-	foreach (var (key, direction) in Config.WalkDirections)
-		if (IsKeyPressed(key) && (maze[maze.Player.Position].Connections & direction) != 0)
-			{
-				maze.Player.Move(direction);
-				maze.TryTeleport(maze.Player.Position);
-			}
-	
-	foreach (var (key, deltaSize) in Config.ResetDirections)
-		if (IsKeyPressed(key))
-		{
-			maze = new Maze(maze.Width + deltaSize.Width, maze.Height + deltaSize.Height, 5, 2);
-			camera.zoom = 16f / Math.Max(maze.Width, maze.Height);
-		}
-	
-	if (IsKeyDown(KeyboardKey.KEY_Q))
+	Config.WalkDirections.ProcessInput(direction =>
 	{
-		var direction = directions.PickRandom();
-		if ((maze[maze.Player.Position].Connections & direction) != 0)
-			maze.Player.Move(direction);
-	}
+		if ((maze[player.Position].Connections & direction) == 0)
+			return;
+		player.Move(direction);
+		maze.TryTeleportPlayer(player);
+		maze.TryCollect(player);
+	});
+
+	Config.ResetDirections.ProcessInput(deltaSize =>
+	{
+		maze = new(maze.Width + deltaSize.Width, maze.Height + deltaSize.Height, 
+			Config.CollectibleCount, Config.TeleportCount);
+		player = new(maze.GetRandomFreePoint());
+		camera.zoom = 16f / Math.Max(maze.Width, maze.Height);
+	});
 
 	if (IsKeyPressed(KeyboardKey.KEY_SLASH))
-		maze.Player.ChangeDirection();
+		player.ChangeDirection();
+}
 
-	maze.TryCollect(maze.Player.Position);
+void Logic()
+{
 
+}
+
+void Draw()
+{
 	BeginDrawing();
 	BeginMode2D(camera);
+
 	ClearBackground(Color.DARKGRAY);
 	maze.DrawMaze();
-	foreach (var collectible in maze.Collectibles)
-		maze.DrawCollectible(collectible);
-	foreach (var teleport in maze.Teleports)
-		maze.DrawTeleport(teleport);
-	maze.DrawPlayer();
+	maze.DrawPlayer(player);
+
 	EndMode2D();
 
-	DrawText($"Score: {maze.Score}\nArrows - move\n/ - change snake direction\nR - reset\nWASD - change size", 32, 32, 20, Color.WHITE);
+	DrawText($"score: {maze.Score}", 32, 32, 40, Color.GREEN);
+	DrawText($"arrows - move\n/ - change direction\nr - reset\nwasd - change size", 32, 72, 20, Color.LIGHTGRAY);
 
 	EndDrawing();
 }
 
-#endregion
+while (!WindowShouldClose())
+{
+	Input();
+	Logic();
+	Draw();
+}
 
 CloseWindow();

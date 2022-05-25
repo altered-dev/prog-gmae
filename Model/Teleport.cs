@@ -12,4 +12,11 @@ public class Teleport
 		Link = other;
 		other.Link = this;
 	}
+
+	public void MovePlayer(Player player)
+	{
+		if (Link == null || player.Contains(Link.Position))
+			return;
+		player.Position = Link.Position;
+	}
 }
