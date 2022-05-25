@@ -7,9 +7,12 @@ public class Maze
 	public Rectangle Bounds { get; }
 
 	public Cell[,] Cells { get; }
-	public Character Character { get; } = new();
+	public Player Player { get; } = new();
+	public List<Collectible> Collectibles { get; } = new();
 
-	public Maze(int width, int height)
+	public int Score { get; private set; }
+
+	public Maze(int width, int height, int collectibleCount)
 	{
 		if (width < 1)
 			width = 1;
@@ -20,12 +23,38 @@ public class Maze
 		Bounds = new(0, 0, width, height);
 		Cells = GenerateMaze(width, height);
 		var random = new Random();
-		Character.Position = new Point(random.Next(Width), random.Next(height));
+		Player.Position = new Point(random.Next(width), random.Next(height));
+		for (var i = 0; i < collectibleCount; i++)
+			AddCollectible();
 	}
 
 	public Cell this[Point pos] => Cells[pos.X, pos.Y];
 
-	public bool CharacterInBounds() => Bounds.Contains(Character.Position);
+	public bool CharacterInBounds() => Bounds.Contains(Player.Position);
+
+	public Collectible? GetCollectible(Point position) => Collectibles.Find(c => c.Position == position);
+
+	private void AddCollectible()
+	{
+		var random = new Random();
+		Point position;
+		do position = new Point(random.Next(Width), random.Next(Height));
+		while (Player.Contains(position) || Collectibles.Any(c => c.Position == position));
+		Collectibles.Add(new(position));
+	}
+
+	public void TryCollect(Point position)
+	{
+		var collectible = GetCollectible(position);
+		if (collectible == null)
+			return;
+
+		var random = new Random();
+		Collectibles.Remove(collectible);
+		AddCollectible();
+		Score++;
+		Player.TailLength++;
+	}
 
 	private static Cell[,] GenerateMaze(int width, int height)
 	{
@@ -66,22 +95,6 @@ public class Maze
 			visitedCount++;
 			current = next;
 		}
-
-		var exit = cells
-			.Cast<Cell>()
-			.Where(cell => cell.Position.X == 0 || cell.Position.Y == 0 
-				|| cell.Position.X == width - 1 || cell.Position.Y == height - 1)
-			.ToList()
-			.PickRandom();
-		
-		exit.Connections |= 
-			exit.Position.X == 0
-				? Direction.Left
-			: exit.Position.X == width - 1
-				? Direction.Right
-			: exit.Position.Y == 0
-				? Direction.Up
-				: Direction.Down;
 
 		return cells;
 	}

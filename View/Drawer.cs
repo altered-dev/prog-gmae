@@ -1,4 +1,3 @@
-using Raylib_cs;
 using static Raylib_cs.Raylib;
 using System.Drawing;
 using Color = Raylib_cs.Color;
@@ -32,18 +31,25 @@ public static class Drawer
 			DrawLine(left, down, right, down, Color.LIGHTGRAY);
 	}
 
-	public static void DrawCharacter(this Maze maze)
+	public static void DrawPlayer(this Maze maze)
 	{
-		var previous = maze.MazeToScreen(maze.Character.Position);
+		var previous = maze.MazeToScreen(maze.Player.Position);
 		var random = new Random();
-		foreach (var point in maze.Character.Trail.Select(p => maze.MazeToScreen(p)))
+		var i = 0;
+		var size = Config.CellSize / 3;
+		foreach (var point in maze.Player.Tail.Select(p => maze.MazeToScreen(p)))
 		{
-			DrawLine(previous.X, previous.Y, point.X, point.Y, Color.DARKGREEN);
-			previous = point;
+			DrawCircle(point.X, point.Y, size - (i++ * 5) / maze.Player.Tail.Count, Color.GREEN);
 		}
 
-		var pos = maze.MazeToScreen(maze.Character.Position);
+		var pos = maze.MazeToScreen(maze.Player.Position);
 		DrawCircle(pos.X, pos.Y, Config.CellSize / 2 - 4, Color.GREEN);
+	}
+
+	public static void DrawCollectible(this Maze maze, Collectible collectible)
+	{
+		var pos = maze.MazeToScreen(collectible.Position);
+		DrawCircle(pos.X, pos.Y, Config.CellSize / 4, Color.ORANGE);
 	}
 
 	public static Point MazeToScreen(this Maze maze, Point position) => new(
