@@ -13,7 +13,7 @@ public static class Drawer
 
 	public static void DrawCell(this Maze maze, int x, int y)
 	{
-		var cell = maze.Cells[x, y];
+		var cell = maze[x, y];
 		if (cell == null)
 			return;
 		var pos = maze.MazeToScreen(cell.Position);
@@ -38,9 +38,7 @@ public static class Drawer
 		var i = 0;
 		var size = Config.CellSize / 3;
 		foreach (var point in maze.Player.Tail.Select(p => maze.MazeToScreen(p)))
-		{
 			DrawCircle(point.X, point.Y, size - (i++ * 5) / maze.Player.Tail.Count, Color.GREEN);
-		}
 
 		var pos = maze.MazeToScreen(maze.Player.Position);
 		DrawCircle(pos.X, pos.Y, Config.CellSize / 2 - 4, Color.GREEN);
@@ -50,6 +48,12 @@ public static class Drawer
 	{
 		var pos = maze.MazeToScreen(collectible.Position);
 		DrawCircle(pos.X, pos.Y, Config.CellSize / 4, Color.ORANGE);
+	}
+
+	public static void DrawTeleport(this Maze maze, Teleport teleport)
+	{
+		var pos = maze.MazeToScreen(teleport.Position);
+		DrawCircleGradient(pos.X, pos.Y, Config.CellSize / 2 - 4, Color.PINK, Color.PURPLE);
 	}
 
 	public static Point MazeToScreen(this Maze maze, Point position) => new(

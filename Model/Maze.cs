@@ -2,65 +2,85 @@ using System.Drawing;
 
 public class Maze
 {
-	public int Width { get; }
-	public int Height { get; }
-	public Rectangle Bounds { get; }
-
-	public Cell[,] Cells { get; }
-	public Player Player { get; } = new();
-	public List<Collectible> Collectibles { get; } = new();
-
+	public readonly int Width, Height;
 	public int Score { get; private set; }
 
-	public Maze(int width, int height, int collectibleCount)
+	private readonly Cell[,] cells;
+	public readonly Player Player = new();
+	public readonly List<Teleport> Teleports = new();
+	public readonly List<Collectible> Collectibles = new();
+
+	private static readonly Random random = new();
+
+	public Maze(int width, int height, int collectibleCount, int teleportCount)
 	{
-		if (width < 1)
-			width = 1;
-		if (height < 1)
-			height = 1;
-		Width = width;
-		Height = height;
-		Bounds = new(0, 0, width, height);
-		Cells = GenerateMaze(width, height);
-		var random = new Random();
-		Player.Position = new Point(random.Next(width), random.Next(height));
+		Width = width < 1 ? 1 : width;
+		Height = height < 1 ? 1 : height;
+		cells = GenerateMaze(Width, Height);
+		Player.Position = new Point(random.Next(Width), random.Next(Height));
 		for (var i = 0; i < collectibleCount; i++)
 			AddCollectible();
+		for (var i = 0; i < teleportCount; i++)
+			AddTeleports();
 	}
 
-	public Cell this[Point pos] => Cells[pos.X, pos.Y];
+	public Cell this[int x, int y] => cells[x, y];
 
-	public bool CharacterInBounds() => Bounds.Contains(Player.Position);
-
-	public Collectible? GetCollectible(Point position) => Collectibles.Find(c => c.Position == position);
+	public Cell this[Point pos] => cells[pos.X, pos.Y];
 
 	private void AddCollectible()
 	{
-		var random = new Random();
 		Point position;
 		do position = new Point(random.Next(Width), random.Next(Height));
-		while (Player.Contains(position) || Collectibles.Any(c => c.Position == position));
+		while (Player.Contains(position) 
+			|| Collectibles.Any(c => c.Position == position) 
+			|| Teleports.Any(t => t.Position == position));
 		Collectibles.Add(new(position));
+	}
+
+	private void AddTeleports()
+	{
+		// omg clutter
+		Point position;
+		do position = new Point(random.Next(Width), random.Next(Height));
+		while (Player.Contains(position)
+			|| Collectibles.Any(c => c.Position == position)
+			|| Teleports.Any(t => t.Position == position));
+		var teleportA = new Teleport(position);
+		Teleports.Add(teleportA);
+		do position = new Point(random.Next(Width), random.Next(Height));
+		while (Player.Contains(position)
+			|| Collectibles.Any(c => c.Position == position)
+			|| Teleports.Any(t => t.Position == position));
+		var teleportB = new Teleport(position);
+		Teleports.Add(teleportB);
+		teleportA.LinkTo(teleportB);
 	}
 
 	public void TryCollect(Point position)
 	{
-		var collectible = GetCollectible(position);
+		var collectible = Collectibles.Find(c => c.Position == position);
 		if (collectible == null)
 			return;
 
-		var random = new Random();
 		Collectibles.Remove(collectible);
 		AddCollectible();
 		Score++;
 		Player.TailLength++;
 	}
 
+	public void TryTeleport(Point position)
+	{
+		var teleport = Teleports.Find(t => t.Position == position);
+		if (teleport == null || teleport.Link == null || Player.Contains(teleport.Link.Position))
+			return;
+		Player.Position = teleport.Link.Position;
+	}
+
 	private static Cell[,] GenerateMaze(int width, int height)
 	{
 		var cells = new Cell[width, height];
 		var visitedCount = 0;
-		var random = new Random();
 		var stack = new Stack<Cell>();
 		cells[0, 0] = new Cell(0, 0);
 		stack.Push(cells[0, 0]);
@@ -82,7 +102,7 @@ public class Maze
 				current = stack.Pop();
 				continue;
 			}
-			var nextPosition = emptyNeighbours.PickRandom<Point>();
+			var nextPosition = emptyNeighbours.PickRandom();
 			var next = new Cell(nextPosition);
 			var dx = nextPosition.X - current.Position.X;
 			var dy = nextPosition.Y - current.Position.Y;
