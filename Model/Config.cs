@@ -19,7 +19,15 @@ public static class Config
 	public static readonly List<Size> PossibleDirections = new()
 		{ new(1, 0), new(0, -1), new(-1, 0), new(0, 1) };
 
-	public static readonly Dictionary<KeyboardKey, Direction> WalkDirections = new()
+	public static readonly Dictionary<KeyboardKey, Direction> Player1WalkDirections = new()
+	{
+		[KeyboardKey.KEY_D] = Direction.Right,
+		[KeyboardKey.KEY_W] = Direction.Up,
+		[KeyboardKey.KEY_A] = Direction.Left,
+		[KeyboardKey.KEY_S] = Direction.Down
+	};
+
+	public static readonly Dictionary<KeyboardKey, Direction> Player2WalkDirections = new()
 	{
 		[KeyboardKey.KEY_RIGHT] = Direction.Right,
 		[KeyboardKey.KEY_UP] = Direction.Up,
@@ -30,9 +38,7 @@ public static class Config
 	public static readonly Dictionary<KeyboardKey, Size> ResetDirections = new()
 	{
 		[KeyboardKey.KEY_R] = new(0, 0),
-		[KeyboardKey.KEY_W] = new(0, -1),
-		[KeyboardKey.KEY_A] = new(-1, 0),
-		[KeyboardKey.KEY_S] = new(0, 1),
-		[KeyboardKey.KEY_D] = new(1, 0)
+		[KeyboardKey.KEY_MINUS] = new(-1, -1),
+		[KeyboardKey.KEY_EQUAL] = new(1, 1),
 	};
 }

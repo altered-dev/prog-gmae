@@ -37,6 +37,20 @@ public static class Extensions
 		return dir;
 	}
 
+	public static Direction Reverse(this Direction direction)
+	{
+		var dir = Direction.None;
+		if ((direction & Direction.Left) != 0)
+			dir |= Direction.Right;
+		if ((direction & Direction.Right) != 0)
+			dir |= Direction.Left;
+		if ((direction & Direction.Up) != 0)
+			dir |= Direction.Down;
+		if ((direction & Direction.Down) != 0)
+			dir |= Direction.Up;
+		return dir;
+	}
+
 	private static readonly Random random = new();
 
 	public static T PickRandom<T>(this List<T> list) => list[random.Next(list.Count)];
@@ -47,4 +61,8 @@ public static class Extensions
 			if (Raylib.IsKeyPressed(key))
 				action(value);
 	}
+
+	public static bool IsInBounds(this Point point, int width, int height) =>
+		0 <= point.X && point.X < width &&
+		0 <= point.Y && point.Y < height;
 }

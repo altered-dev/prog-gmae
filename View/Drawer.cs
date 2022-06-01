@@ -25,6 +25,9 @@ public static class Drawer
 		var up = pos.Y - Config.CellSize / 2;
 		var left = pos.X - Config.CellSize / 2;
 		var down = pos.Y + Config.CellSize / 2;
+
+		DrawRectangle(left, up, right - left, down - up, cell.Color);
+
 		if ((cell.Connections & Direction.Right) == 0)
 			DrawLine(right, up, right, down, Color.LIGHTGRAY);
 		if ((cell.Connections & Direction.Up) == 0)
@@ -42,22 +45,26 @@ public static class Drawer
 		var i = 0;
 		var size = Config.CellSize / 3;
 		foreach (var point in player.Tail.Select(p => maze.MazeToScreen(p)))
-			DrawCircle(point.X, point.Y, size - (i++ * 5) / player.Tail.Count, Color.GREEN);
+			DrawCircle(point.X, point.Y, size - (i++ * 5) / player.Tail.Count, player.Color);
 
 		var pos = maze.MazeToScreen(player.Position);
-		DrawCircle(pos.X, pos.Y, Config.CellSize / 2 - 4, Color.GREEN);
+		DrawCircle(pos.X, pos.Y, Config.CellSize / 2 - 4, player.Color);
+		DrawCircleLines(pos.X, pos.Y, Config.CellSize / 2 - 8, new Color(0, 0, 0, 125));
 	}
 
 	public static void DrawCollectible(this Maze maze, Collectible collectible)
 	{
 		var pos = maze.MazeToScreen(collectible.Position);
 		DrawCircle(pos.X, pos.Y, Config.CellSize / 4, Color.ORANGE);
+		DrawCircle(pos.X, pos.Y, Config.CellSize / 4 - 4, collectible.SecondaryColor);
 	}
 
 	public static void DrawTeleport(this Maze maze, Teleport teleport)
 	{
 		var pos = maze.MazeToScreen(teleport.Position);
-		DrawCircleGradient(pos.X, pos.Y, Config.CellSize / 2 - 4, Color.PINK, Color.PURPLE);
+		DrawCircle(pos.X, pos.Y, Config.CellSize / 2 - 4, teleport.Color);
+		DrawCircle(pos.X, pos.Y, Config.CellSize / 2 - 10, new Color(0, 0, 0, 125));
+		DrawCircleLines(pos.X, pos.Y, Config.CellSize / 2 - 4, Color.RAYWHITE);
 	}
 
 	public static Point MazeToScreen(this Maze maze, Point position) => new(
