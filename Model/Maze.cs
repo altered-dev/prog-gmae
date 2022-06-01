@@ -15,7 +15,7 @@ public class Maze
 	{
 		Width = width < 1 ? 1 : width;
 		Height = height < 1 ? 1 : height;
-		cells = Generator.GenerateMaze(Width, Height);
+		cells = Generator.GenerateMaze(Width, Height, Config.RandomMaze);
 		for (var i = 0; i < collectibleCount; i++)
 			AddCollectible();
 		for (var i = 0; i < teleportCount; i++)
@@ -72,8 +72,11 @@ public class Maze
 
 	public void AddWall(Point position, Direction direction)
 	{
+		var newPos = position + direction.ToCoords();
+		if (!newPos.IsInBounds(Width, Height))
+			return;
 		this[position].Connections &= ~direction;
-		this[position + direction.ToCoords()].Connections &= ~direction.Reverse();
+		this[newPos].Connections &= ~direction.Reverse();
 	}
 
 	public void RemoveWall(Point position, Direction direction)

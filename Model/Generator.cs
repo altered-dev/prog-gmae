@@ -2,16 +2,20 @@ using System.Drawing;
 
 public static class Generator
 {
-	public static Cell[,] GenerateMaze(int width, int height)
+	public static Cell[,] GenerateMaze(int width, int height, bool isRandom = true)
 	{
 		var cells = new Cell[width, height];
 		var stack = new Stack<Cell>();
-		var current = cells[0, 0] = new(0, 0);
+		var random = new Random();
+		var x = random.Next(width);
+		var y = random.Next(height);
+		var current = cells[x, y] = new(x, y);
 		stack.Push(current);
+		var directions = Config.PossibleDirections.OrderBy(dir => random.Next()).ToList();
 
 		for (var visitedCount = 0; visitedCount < width * height;)
 		{
-			var emptyNeighbours = Config.PossibleDirections
+			var emptyNeighbours = (isRandom ? Config.PossibleDirections : directions)
 				.Select(direction => current.Position + direction)
 				.Where(coord => coord.IsInBounds(width, height) && cells[coord.X, coord.Y] == null)
 				.ToList();
@@ -23,7 +27,7 @@ public static class Generator
 				current = stack.Pop();
 				continue;
 			}
-			var nextPosition = emptyNeighbours.PickRandom();
+			var nextPosition = isRandom ? emptyNeighbours.PickRandom() : emptyNeighbours.First();
 			var next = new Cell(nextPosition);
 			var dx = nextPosition.X - current.Position.X;
 			var dy = nextPosition.Y - current.Position.Y;

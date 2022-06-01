@@ -8,13 +8,13 @@ using Color = Raylib_cs.Color;
 
 #region initialization
 
+SetConfigFlags(ConfigFlags.FLAG_MSAA_4X_HINT | ConfigFlags.FLAG_WINDOW_RESIZABLE);
 InitWindow(Config.WindowWidth, Config.WindowHeight, Config.WindowName);
-SetConfigFlags(ConfigFlags.FLAG_MSAA_4X_HINT);
 
 var camera = new Camera2D(Config.WindowCenter, Vector2.Zero, 0f, 1f);
 var directions = Config.Player1WalkDirections.Values.ToList();
 var inputLocked = false;
-Reset(new(Config.InitialWidth, Config.InitialHeight), true, ref camera, ref inputLocked, 
+Reset(new(Config.InitialWidth, Config.InitialHeight), Config.StartWithMultiplayer, ref camera, ref inputLocked, 
 	out var maze, out var player1, out var player2, out var isMultiplayer);
 
 #endregion
@@ -46,6 +46,13 @@ void Logic()
 {
 	if (player1.TailLength < 0 || player2.TailLength < 0)
 		inputLocked = true;
+
+	if (IsWindowResized())
+	{
+		Config.WindowWidth = GetScreenWidth();
+		Config.WindowHeight = GetScreenHeight();
+		camera.offset = Config.WindowCenter;
+	}
 }
 
 void Draw()
@@ -70,12 +77,12 @@ void Draw()
 		DrawTextRight("/ - change direction", 32, 114, 20, Color.LIGHTGRAY);
 
 		if (player1.TailLength < 0)
-			DrawTextCenter("blue won", 0, Config.WindowHeight - 72, 40, Color.BLUE);
+			DrawTextCenter("blue wins", 0, Config.WindowHeight - 72, 40, Color.BLUE);
 		else if (player2.TailLength < 0)
-			DrawTextCenter("green won", 0, Config.WindowHeight - 72, 40, Color.GREEN);
+			DrawTextCenter("green wins", 0, Config.WindowHeight - 72, 40, Color.GREEN);
 	}
 	else if (player1.TailLength < 0)
-		DrawTextCenter("you lost", 0, Config.WindowHeight - 72, 40, Color.LIGHTGRAY);
+		DrawTextCenter("you lose", 0, Config.WindowHeight - 72, 40, Color.LIGHTGRAY);
 
 	EndDrawing();
 }

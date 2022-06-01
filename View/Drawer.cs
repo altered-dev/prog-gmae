@@ -1,3 +1,4 @@
+using System.Numerics;
 using static Raylib_cs.Raylib;
 using System.Drawing;
 using Color = Raylib_cs.Color;
@@ -20,36 +21,35 @@ public static class Drawer
 		var cell = maze[x, y];
 		if (cell == null)
 			return;
-		var pos = maze.MazeToScreen(cell.Position);
-		var right = pos.X + Config.CellSize / 2;
-		var up = pos.Y - Config.CellSize / 2;
-		var left = pos.X - Config.CellSize / 2;
-		var down = pos.Y + Config.CellSize / 2;
+		var pos = maze.MazeToScreenV(cell.Position) + Vector2.One * 0.5f;
+		var right = pos.X + Config.CellSize / 2f;
+		var up    = pos.Y - Config.CellSize / 2f;
+		var left  = pos.X - Config.CellSize / 2f;
+		var down  = pos.Y + Config.CellSize / 2f;
 
-		DrawRectangle(left, up, right - left, down - up, cell.Color);
+		DrawRectangleRec(new(left, up, right - left, down - up), cell.Color);
 
 		if ((cell.Connections & Direction.Right) == 0)
-			DrawLine(right, up, right, down, Color.LIGHTGRAY);
+			DrawLineV(new(right, up), new(right, down), Color.LIGHTGRAY);
 		if ((cell.Connections & Direction.Up) == 0)
-			DrawLine(left, up, right, up, Color.LIGHTGRAY);
+			DrawLineV(new(left, up), new(right, up), Color.LIGHTGRAY);
 		if ((cell.Connections & Direction.Left) == 0)
-			DrawLine(left, up, left, down, Color.LIGHTGRAY);
+			DrawLineV(new(left, up), new(left, down), Color.LIGHTGRAY);
 		if ((cell.Connections & Direction.Down) == 0)
-			DrawLine(left, down, right, down, Color.LIGHTGRAY);
+			DrawLineV(new(left, down), new(right, down), Color.LIGHTGRAY);
 	}
 
 	public static void DrawPlayer(this Maze maze, Player player)
 	{
-		var previous = maze.MazeToScreen(player.Position);
 		var random = new Random();
 		var i = 0;
 		var size = Config.CellSize / 3;
-		foreach (var point in player.Tail.Select(p => maze.MazeToScreen(p)))
-			DrawCircle(point.X, point.Y, size - (i++ * 5) / player.Tail.Count, player.Color);
+		foreach (var point in player.Tail.Select(p => maze.MazeToScreenV(p)))
+			DrawCircleV(point, size - (i++ * 5) / player.Tail.Count, player.Color);
 
-		var pos = maze.MazeToScreen(player.Position);
-		DrawCircle(pos.X, pos.Y, Config.CellSize / 2 - 4, player.Color);
-		DrawCircleLines(pos.X, pos.Y, Config.CellSize / 2 - 8, new Color(0, 0, 0, 125));
+		
+		var pos = maze.MazeToScreenV(player.Position);
+		DrawCircleV(pos, Config.CellSize / 2 - 4, player.Color);
 	}
 
 	public static void DrawCollectible(this Maze maze, Collectible collectible)
@@ -61,15 +61,22 @@ public static class Drawer
 
 	public static void DrawTeleport(this Maze maze, Teleport teleport)
 	{
-		var pos = maze.MazeToScreen(teleport.Position);
-		DrawCircle(pos.X, pos.Y, Config.CellSize / 2 - 4, teleport.Color);
-		DrawCircle(pos.X, pos.Y, Config.CellSize / 2 - 10, new Color(0, 0, 0, 125));
-		DrawCircleLines(pos.X, pos.Y, Config.CellSize / 2 - 4, Color.RAYWHITE);
+		var pos = maze.MazeToScreenV(teleport.Position);
+		var start = pos - Vector2.One * (Config.CellSize / 2.0f - 4);
+		var end   = pos + Vector2.One * (Config.CellSize / 2.0f - 4);
+		DrawRectangleV(start, Vector2.One * (Config.CellSize - 8), teleport.Color);
+		DrawRectangleV(start + Vector2.One * 4.0f, Vector2.One * (Config.CellSize - 16), Color.BLACK with {a = 125});
+
+		DrawRectangleLinesEx(new(start.X, start.Y, Config.CellSize - 8, Config.CellSize - 8), 1.0f, Color.RAYWHITE);
 	}
 
 	public static Point MazeToScreen(this Maze maze, Point position) => new(
 		(int)((position.X - (maze.Width / 2.0f) + 0.5f) * Config.CellSize), 
 		(int)((position.Y - (maze.Height / 2.0f) + 0.5f) * Config.CellSize));
+
+	public static Vector2 MazeToScreenV(this Maze maze, Point position) => new(
+		((position.X - (maze.Width / 2.0f) + 0.5f) * Config.CellSize), 
+		((position.Y - (maze.Height / 2.0f) + 0.5f) * Config.CellSize));
 	
 	public static void DrawTextRight(string text, int posX, int posY, int fontSize, Color color) =>
 		DrawText(text, Config.WindowWidth - MeasureText(text, fontSize) - posX, posY, fontSize, color);

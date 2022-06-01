@@ -12,7 +12,7 @@ public static class Control
 		maze = new(size.Width, size.Height, random.Next(3, 11), random.Next(2, 5));
 		player1 = new(maze.GetRandomFreePoint(), Color.GREEN, Config.Player1WalkDirections);
 		player2 = new(maze.GetRandomFreePoint(player1), Color.BLUE, Config.Player2WalkDirections);
-		camera.zoom = 16f / Math.Max(maze.Width, maze.Height);
+		// camera.zoom = 16f / Math.Max(maze.Width, maze.Height);
 	}
 
 	public static void MovePlayer(this Maze maze, Player player, Direction direction, Player? otherPlayer = null)

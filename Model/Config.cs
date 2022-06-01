@@ -13,6 +13,8 @@ public static class Config
 	public const int InitialHeight = 16;
 	public const int CollectibleCount = 5;
 	public const int TeleportCount = 2;
+	public const bool StartWithMultiplayer = true;
+	public const bool RandomMaze = true;
 
 	public static Vector2 WindowCenter => new(WindowWidth / 2, WindowHeight / 2);
 
