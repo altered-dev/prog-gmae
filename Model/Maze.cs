@@ -21,10 +21,10 @@ public class Maze
 			AddCollectible();
 		for (var i = 0; i < teleportCount; i++)
 			AddTeleports(i);
-		for (var i = 0; i < random.Next(Width, Width * 4); i++)
-			RemoveWall(GetRandomFreePoint(), Direction.Down);
-		for (var i = 0; i < random.Next(Height, Height * 4); i++)
-			RemoveWall(GetRandomFreePoint(), Direction.Right);
+		// for (var i = 0; i < random.Next(Width, Width * 4); i++)
+		// 	RemoveWall(GetRandomFreePoint(), Direction.Down);
+		// for (var i = 0; i < random.Next(Height, Height * 4); i++)
+		// 	RemoveWall(GetRandomFreePoint(), Direction.Right);
 		for (var i = 0; i < enemyCount; i++)
 			AddEnemy();
 	}

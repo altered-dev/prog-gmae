@@ -10,6 +10,7 @@ public static class Generator
 		var x = random.Next(width);
 		var y = random.Next(height);
 		var current = cells[x, y] = new(x, y);
+		var visited = new HashSet<Point>();
 		stack.Push(current);
 		var directions = Config.PossibleDirections.OrderBy(dir => random.Next()).ToList();
 
@@ -17,7 +18,7 @@ public static class Generator
 		{
 			var emptyNeighbours = (isRandom ? Config.PossibleDirections : directions)
 				.Select(direction => current.Position + direction)
-				.Where(coord => coord.IsInBounds(width, height) && cells[coord.X, coord.Y] == null)
+				.Where(coord => coord.IsInBounds(width, height) && (cells[coord.X, coord.Y] == null || !visited.Contains(coord)))
 				.ToList();
 			if (!emptyNeighbours.Any())
 			{
@@ -28,7 +29,7 @@ public static class Generator
 				continue;
 			}
 			var nextPosition = isRandom ? emptyNeighbours.PickRandom() : emptyNeighbours.First();
-			var next = new Cell(nextPosition);
+			var next = cells[nextPosition.X, nextPosition.Y] ?? new Cell(nextPosition);
 			var dx = nextPosition.X - current.Position.X;
 			var dy = nextPosition.Y - current.Position.Y;
 
@@ -37,7 +38,11 @@ public static class Generator
 
 			cells[nextPosition.X, nextPosition.Y] = next;
 			stack.Push(next);
-			visitedCount++;
+			if (random.Next(10) < 6)
+			{
+				visited.Add(nextPosition);
+				visitedCount++;
+			}
 			current = next;
 		}
 
