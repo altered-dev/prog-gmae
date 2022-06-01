@@ -38,7 +38,7 @@ public static class Generator
 
 			cells[nextPosition.X, nextPosition.Y] = next;
 			stack.Push(next);
-			if (random.Next(10) < 6)
+			if (random.Next(10) < Config.MazeDensity && !visited.Contains(nextPosition))
 			{
 				visited.Add(nextPosition);
 				visitedCount++;

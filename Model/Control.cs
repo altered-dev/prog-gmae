@@ -33,7 +33,7 @@ public static class Control
 			maze.TryCollect(player);
 		var random = new Random();
 		foreach (var enemy in maze.Enemies)
-			if (random.Next(10) < 5)
+			if (random.Next(10) < Config.EnemySpeed)
 			{
 				if (otherPlayer != null)
 					enemy.MoveTowards(maze, player, otherPlayer);

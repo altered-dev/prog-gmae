@@ -11,6 +11,8 @@ public static class Config
 	public const int CellSize = 32;
 	public const int InitialWidth = 16;
 	public const int InitialHeight = 16;
+	public const int MazeDensity = 5;
+	public const int EnemySpeed = 5;
 	public const bool StartWithMultiplayer = true;
 	public const bool RandomMaze = true;
 

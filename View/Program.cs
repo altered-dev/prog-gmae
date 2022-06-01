@@ -82,7 +82,7 @@ void Draw()
 	EndMode2D();
 
 	DrawText($"score: {player1.Score}", 32, 32, 40, Color.GREEN);
-	DrawText("wasd - move\nz - change direction\nr - reset\n-+ - change size", 32, 84, 20, Color.LIGHTGRAY);
+	DrawText("wasd - move\nz - change direction\nr - reset\n-+ - change size\nm - toggle multiplayer", 32, 84, 20, Color.LIGHTGRAY);
 	if (isMultiplayer)
 	{
 		DrawTextRight($"score: {player2.Score}", 32, 32, 40, Color.BLUE);
