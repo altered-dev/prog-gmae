@@ -61,9 +61,14 @@ void Draw()
 	BeginDrawing();
 	BeginMode2D(camera);
 
-	maze.DrawPath(player1.Position, maze.ScreenToMaze(GetMousePosition()));
+	
 	if (isMultiplayer)
-		maze.DrawPath(player2.Position, maze.ScreenToMaze(GetMousePosition()));
+	{
+		maze.DrawPath(player1.Position, maze.ScreenToMaze(GetMousePosition()), players: new[] {player1, player2});
+		maze.DrawPath(player2.Position, maze.ScreenToMaze(GetMousePosition()), players: new[] {player1, player2});
+	}
+	else
+		maze.DrawPath(player1.Position, maze.ScreenToMaze(GetMousePosition()), players: player1);
 
 	ClearBackground(Color.DARKGRAY);
 	maze.DrawMaze();

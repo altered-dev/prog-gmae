@@ -70,9 +70,9 @@ public static class Drawer
 		DrawRectangleLinesEx(new(start.X, start.Y, Config.CellSize - 8, Config.CellSize - 8), 1.0f, Color.RAYWHITE);
 	}
 
-	public static void DrawPath(this Maze maze, Point from, Point to)
+	public static void DrawPath(this Maze maze, Point from, Point to, bool ignoreEnemies = false, params Player[] players)
 	{
-		var path = maze.FindPath(from, to, cosmetic: true);
+		var path = maze.FindPath(from, to, ignoreEnemies, true, players);
 		path?.Aggregate(from, (point, dir) => 
 		{
 			var next = point + dir;

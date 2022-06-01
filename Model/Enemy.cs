@@ -21,6 +21,8 @@ public class Enemy
 		if (path == null)
 			return;
 		var newPos = Position + path.FirstOrDefault();
+		if (maze.Enemies.Any(e => e.Position == newPos))
+			return;
 		var player = players.FirstOrDefault(player => player.Contains(newPos));
 		if (player != null)
 			player.TailLength = -1;
