@@ -70,13 +70,38 @@ public static class Drawer
 		DrawRectangleLinesEx(new(start.X, start.Y, Config.CellSize - 8, Config.CellSize - 8), 1.0f, Color.RAYWHITE);
 	}
 
+	public static void DrawPath(this Maze maze, Point from, Point to)
+	{
+		var path = maze.FindPath(from, to, cosmetic: true);
+		path?.Aggregate(from, (point, dir) => 
+		{
+			var next = point + dir;
+			var start = maze.MazeToScreenV(point);
+			var end = maze.MazeToScreenV(next);
+			if (Math.Abs(dir.Width) <= 1 && Math.Abs(dir.Height)<= 1)
+				DrawLineV(start, end, Color.GRAY);
+			return next;
+		});
+	}
+
+	public static void DrawEnemy(this Maze maze, Enemy enemy)
+	{
+		var pos = maze.MazeToScreenV(enemy.Position);
+		DrawCircleV(pos, Config.CellSize / 2 - 4, enemy.Color);
+	}
+
 	public static Point MazeToScreen(this Maze maze, Point position) => new(
 		(int)((position.X - (maze.Width / 2.0f) + 0.5f) * Config.CellSize), 
 		(int)((position.Y - (maze.Height / 2.0f) + 0.5f) * Config.CellSize));
 
 	public static Vector2 MazeToScreenV(this Maze maze, Point position) => new(
-		((position.X - (maze.Width / 2.0f) + 0.5f) * Config.CellSize), 
-		((position.Y - (maze.Height / 2.0f) + 0.5f) * Config.CellSize));
+		(position.X - (maze.Width / 2.0f) + 0.5f) * Config.CellSize, 
+		(position.Y - (maze.Height / 2.0f) + 0.5f) * Config.CellSize);
+	
+	public static Point ScreenToMaze(this Maze maze, Vector2 point) => new(
+		(int) Math.Round((point.X - Config.WindowCenter.X) / Config.CellSize - 0.5f + maze.Width / 2.0f),
+		(int) Math.Round((point.Y - Config.WindowCenter.Y) / Config.CellSize - 0.5f + maze.Height / 2.0f)
+	);
 	
 	public static void DrawTextRight(string text, int posX, int posY, int fontSize, Color color) =>
 		DrawText(text, Config.WindowWidth - MeasureText(text, fontSize) - posX, posY, fontSize, color);

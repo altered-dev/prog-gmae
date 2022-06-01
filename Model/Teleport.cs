@@ -4,7 +4,8 @@ using Color = Raylib_cs.Color;
 public class Teleport
 {
 	private static readonly List<Color> colors = new()
-		{ Color.BEIGE, Color.DARKBLUE, Color.GOLD, Color.MAGENTA };
+		{ Color.BEIGE, Color.DARKBLUE, Color.GOLD, Color.MAGENTA, Color.LIME };
+	public static readonly int MaxTeleports = colors.Count;
 
 	public Point Position { get; }
 	public Teleport? Link { get; private set; }

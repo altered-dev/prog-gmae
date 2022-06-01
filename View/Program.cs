@@ -16,6 +16,7 @@ var directions = Config.Player1WalkDirections.Values.ToList();
 var inputLocked = false;
 Reset(new(Config.InitialWidth, Config.InitialHeight), Config.StartWithMultiplayer, ref camera, ref inputLocked, 
 	out var maze, out var player1, out var player2, out var isMultiplayer);
+var random = new Random();
 
 #endregion
 
@@ -60,11 +61,18 @@ void Draw()
 	BeginDrawing();
 	BeginMode2D(camera);
 
+	maze.DrawPath(player1.Position, maze.ScreenToMaze(GetMousePosition()));
+	if (isMultiplayer)
+		maze.DrawPath(player2.Position, maze.ScreenToMaze(GetMousePosition()));
+
 	ClearBackground(Color.DARKGRAY);
 	maze.DrawMaze();
 	maze.DrawPlayer(player1);
 	if (isMultiplayer)
 		maze.DrawPlayer(player2);
+
+	foreach (var enemy in maze.Enemies)
+		maze.DrawEnemy(enemy);
 
 	EndMode2D();
 

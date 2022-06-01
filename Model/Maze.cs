@@ -8,10 +8,11 @@ public class Maze
 	private readonly Cell[,] cells;
 	public readonly List<Teleport> Teleports = new();
 	public readonly List<Collectible> Collectibles = new();
+	public readonly List<Enemy> Enemies = new();
 
 	private static readonly Random random = new();
 
-	public Maze(int width, int height, int collectibleCount, int teleportCount)
+	public Maze(int width, int height, int collectibleCount, int teleportCount, int enemyCount)
 	{
 		Width = width < 1 ? 1 : width;
 		Height = height < 1 ? 1 : height;
@@ -24,6 +25,8 @@ public class Maze
 			RemoveWall(GetRandomFreePoint(), Direction.Down);
 		for (var i = 0; i < random.Next(Height * 2); i++)
 			RemoveWall(GetRandomFreePoint(), Direction.Right);
+		for (var i = 0; i < enemyCount; i++)
+			AddEnemy();
 	}
 
 	public Cell this[int x, int y] => cells[x, y];
@@ -33,7 +36,8 @@ public class Maze
 	public bool IsCellOccupied(Point position, params Player[] players) => 
 		players.Any(player => player.Contains(position)) ||
 		Collectibles.Any(c => c.Position == position) ||
-		Teleports.Any(t => t.Position == position);
+		Teleports.Any(t => t.Position == position) ||
+		Enemies.Any(e => e.Position == position);
 
 	public Point GetRandomFreePoint(params Player[] players)
 	{
@@ -43,7 +47,7 @@ public class Maze
 		return result;
 	}
 
-	private void AddCollectible(params Player[] players) => 
+	public void AddCollectible(params Player[] players) => 
 		Collectibles.Add(Generator.CreateCollectible(GetRandomFreePoint(players)));
 
 	private void AddTeleports(int i)
@@ -53,6 +57,11 @@ public class Maze
 		Teleports.Add(teleportA);
 		Teleports.Add(teleportB);
 		teleportA.LinkTo(teleportB, i);
+	}
+
+	private void AddEnemy()
+	{
+		Enemies.Add(new(GetRandomFreePoint(), Raylib_cs.Color.RED));
 	}
 
 	public void TryCollect(params Player[] players)
