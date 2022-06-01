@@ -12,11 +12,11 @@ public static class Generator
 		var current = cells[x, y] = new(x, y);
 		var visited = new HashSet<Point>();
 		stack.Push(current);
-		var directions = Config.PossibleDirections.OrderBy(dir => random.Next()).ToList();
+		var directions = Config.PossibleDirections.OrderBy(_ => random.Next()).ToList();
 
 		for (var visitedCount = 0; visitedCount < width * height;)
 		{
-			var emptyNeighbours = (isRandom ? Config.PossibleDirections : directions)
+			var emptyNeighbours = directions
 				.Select(direction => current.Position + direction)
 				.Where(coord => coord.IsInBounds(width, height) && (cells[coord.X, coord.Y] == null || !visited.Contains(coord)))
 				.ToList();
@@ -24,7 +24,6 @@ public static class Generator
 			{
 				if (!stack.Any())
 					break;
-				
 				current = stack.Pop();
 				continue;
 			}
@@ -41,8 +40,11 @@ public static class Generator
 			if (random.Next(10) < Config.MazeDensity && !visited.Contains(nextPosition))
 			{
 				visited.Add(nextPosition);
-				visitedCount++;
+				if (Config.PerfectSquareMaze)
+					visitedCount++;
 			}
+			if (!Config.PerfectSquareMaze)
+				visitedCount++;
 			current = next;
 		}
 

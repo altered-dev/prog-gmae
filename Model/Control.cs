@@ -20,8 +20,14 @@ public static class Control
 
 	public static void MovePlayer(this Maze maze, Player player, Direction direction, Player? otherPlayer = null)
 	{
-		if ((maze[player.Position].Connections & direction) == 0)
+		if (!(player.Position + direction.ToCoords()).IsInBounds(maze.Width, maze.Height))
 			return;
+		if ((maze[player.Position].Connections & direction) == 0)
+		{
+			if (!Config.DiggerMode)
+				return;
+			maze.RemoveWall(player.Position, direction);
+		}
 		// == true because the result of the expression is "bool?"
 		if (otherPlayer?.Contains(player.Position + direction.ToCoords()) == true)
 			return;

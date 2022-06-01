@@ -5,8 +5,9 @@ public static class PathFinder
 	private static readonly Size[] directions = 
 		{ new(-1, 0), new(0, -1), new(1, 0), new(0, 1) };
 
-	private static IEnumerable<Size> GetDirections(this Maze maze, Point point) => directions
-		.Where(dir => (maze[point].Connections & new Point(dir).ToDirection()) != 0);
+	private static IEnumerable<Size> GetDirections(this Maze maze, Point point) => 
+		Config.PossibleDirections
+			.Where(dir => (maze[point].Connections & new Point(dir).ToDirection()) != 0);
 
 	public static List<Size>? FindPath(this Maze maze, Point from, Point to, 
 		bool ignoreEnemies = false, bool cosmetic = false, params Player[] players)
@@ -16,21 +17,17 @@ public static class PathFinder
 		var root = new Link<Point>(from);
 		foreach (var dir in maze.GetDirections(from))
 			queue.Enqueue(new(from + dir, root));
-		var started = false;
 		while (queue.Any())
 		{
 			var link = queue.Dequeue();
 			var point = link.Value;
-			if (started)
+			var tp = maze.Teleports.Find(tp => tp.Position == point);
+			if (tp != null)
 			{
-				var tp = maze.Teleports.Find(tp => tp.Position == point);
-				if (tp != null)
-				{
-					if (cosmetic)
-						link = new(point = tp.Link!.Position, link);
-					else
-						link.Value = point = tp.Link!.Position;
-				}
+				if (cosmetic)
+					link = new(point = tp.Link!.Position, link);
+				else
+					link.Value = point = tp.Link!.Position;
 			}
 			if (!point.IsInBounds(maze.Width, maze.Height) || visited.Contains(point)
 				|| players.Any(p => p.Contains(point))
@@ -44,7 +41,6 @@ public static class PathFinder
 			visited.Add(point);
 			foreach (var direction in maze.GetDirections(point))
 				queue.Enqueue(new(point + direction, link));
-			started = true;
 		}
 		return null;
 	}

@@ -13,8 +13,10 @@ public static class Config
 	public const int InitialHeight = 16;
 	public const int MazeDensity = 5; // 1 to 10
 	public const int EnemySpeed = 5; // 1 to 10
-	public const bool StartWithMultiplayer = true;
+	public const bool StartWithMultiplayer = false;
 	public const bool RandomMaze = true;
+	public const bool PerfectSquareMaze = false;
+	public const bool DiggerMode = false;
 
 	public static Vector2 WindowCenter => new(WindowWidth / 2, WindowHeight / 2);
 

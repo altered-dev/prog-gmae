@@ -20,10 +20,11 @@ public class Teleport
 		Color = other.Color = colors[i];
 	}
 
-	public void MovePlayer(Player player)
+	public bool MovePlayer(Player player)
 	{
 		if (Link == null || player.Contains(Link.Position))
-			return;
+			return false;
 		player.Position = Link.Position;
+		return true;
 	}
 }

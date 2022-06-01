@@ -29,11 +29,20 @@ public class Maze
 			AddEnemy();
 	}
 
-	public Cell this[int x, int y] => cells[x, y];
+	public Cell this[int x, int y]
+	{
+		get => cells[x, y];
+		set => cells[x, y] = value;
+	}
 
-	public Cell this[Point pos] => cells[pos.X, pos.Y];
+	public Cell this[Point pos]
+	{
+		get => cells[pos.X, pos.Y];
+		set => cells[pos.X, pos.Y] = value;
+	}
 
 	public bool IsCellOccupied(Point position, params Player[] players) => 
+		this[position] == null ||
 		players.Any(player => player.Contains(position)) ||
 		Collectibles.Any(c => c.Position == position) ||
 		Teleports.Any(t => t.Position == position) ||
@@ -94,10 +103,11 @@ public class Maze
 		if (!newPos.IsInBounds(Width, Height))
 			return;
 		this[position].Connections |= direction;
+		this[newPos] ??= new(newPos);
 		this[newPos].Connections |= direction.Reverse();
 	}
 
-	public void TryTeleportPlayer(Player player) => Teleports
+	public bool TryTeleportPlayer(Player player) => Teleports
 		.Find(t => t.Position == player.Position)?
-		.MovePlayer(player);
+		.MovePlayer(player) ?? false;
 }
