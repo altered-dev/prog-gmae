@@ -33,7 +33,7 @@ public static class Drawer
 		if ((cell.Connections & Direction.Up) == 0)
 			DrawLine(left, up, right, up, Color.LIGHTGRAY);
 		if ((cell.Connections & Direction.Left) == 0)
-			DrawLine(left, up - 1, left, down, Color.LIGHTGRAY);
+			DrawLine(left, up, left, down, Color.LIGHTGRAY);
 		if ((cell.Connections & Direction.Down) == 0)
 			DrawLine(left, down, right, down, Color.LIGHTGRAY);
 	}
@@ -70,4 +70,10 @@ public static class Drawer
 	public static Point MazeToScreen(this Maze maze, Point position) => new(
 		(int)((position.X - (maze.Width / 2.0f) + 0.5f) * Config.CellSize), 
 		(int)((position.Y - (maze.Height / 2.0f) + 0.5f) * Config.CellSize));
+	
+	public static void DrawTextRight(string text, int posX, int posY, int fontSize, Color color) =>
+		DrawText(text, Config.WindowWidth - MeasureText(text, fontSize) - posX, posY, fontSize, color);
+	
+	public static void DrawTextCenter(string text, int posX, int posY, int fontSize, Color color) =>
+		DrawText(text, (Config.WindowWidth - MeasureText(text, fontSize) + posX) / 2, posY, fontSize, color);
 }

@@ -1,5 +1,4 @@
 using System.Drawing;
-using Color = Raylib_cs.Color;
 
 public class Maze
 {
@@ -20,7 +19,7 @@ public class Maze
 		for (var i = 0; i < collectibleCount; i++)
 			AddCollectible();
 		for (var i = 0; i < teleportCount; i++)
-			AddTeleports(Teleport.Colors[i]);
+			AddTeleports(i);
 		for (var i = 0; i < random.Next(Width * 2); i++)
 			RemoveWall(GetRandomFreePoint(), Direction.Down);
 		for (var i = 0; i < random.Next(Height * 2); i++)
@@ -47,13 +46,13 @@ public class Maze
 	private void AddCollectible(params Player[] players) => 
 		Collectibles.Add(Generator.CreateCollectible(GetRandomFreePoint(players)));
 
-	private void AddTeleports(Color color)
+	private void AddTeleports(int i)
 	{
 		var teleportA = new Teleport(GetRandomFreePoint());
 		var teleportB = new Teleport(GetRandomFreePoint());
 		Teleports.Add(teleportA);
 		Teleports.Add(teleportB);
-		teleportA.LinkTo(teleportB, color);
+		teleportA.LinkTo(teleportB, i);
 	}
 
 	public void TryCollect(params Player[] players)
@@ -80,7 +79,7 @@ public class Maze
 	public void RemoveWall(Point position, Direction direction)
 	{
 		var newPos = position + direction.ToCoords();
-		if (0 > newPos.X || newPos.X >= Width || 0 > newPos.Y || newPos.Y >= Height)
+		if (!newPos.IsInBounds(Width, Height))
 			return;
 		this[position].Connections |= direction;
 		this[newPos].Connections |= direction.Reverse();

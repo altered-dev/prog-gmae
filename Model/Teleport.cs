@@ -3,7 +3,7 @@ using Color = Raylib_cs.Color;
 
 public class Teleport
 {
-	public static readonly List<Color> Colors = new()
+	private static readonly List<Color> colors = new()
 		{ Color.BEIGE, Color.DARKBLUE, Color.GOLD, Color.MAGENTA };
 
 	public Point Position { get; }
@@ -12,11 +12,11 @@ public class Teleport
 
 	public Teleport(Point position) => Position = position;
 
-	public void LinkTo(Teleport other, Color color)
+	public void LinkTo(Teleport other, int i)
 	{
 		Link = other;
 		other.Link = this;
-		Color = other.Color = color;
+		Color = other.Color = colors[i];
 	}
 
 	public void MovePlayer(Player player)
