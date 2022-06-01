@@ -1,4 +1,5 @@
 using System.Numerics;
+using Raylib_cs;
 using static Raylib_cs.Raylib;
 using System.Drawing;
 using Color = Raylib_cs.Color;
@@ -98,9 +99,9 @@ public static class Drawer
 		(position.X - (maze.Width / 2.0f) + 0.5f) * Config.CellSize, 
 		(position.Y - (maze.Height / 2.0f) + 0.5f) * Config.CellSize);
 	
-	public static Point ScreenToMaze(this Maze maze, Vector2 point) => new(
-		(int) Math.Round((point.X - Config.WindowCenter.X) / Config.CellSize - 0.5f + maze.Width / 2.0f),
-		(int) Math.Round((point.Y - Config.WindowCenter.Y) / Config.CellSize - 0.5f + maze.Height / 2.0f)
+	public static Point ScreenToMaze(this Maze maze, Vector2 point, Camera2D camera) => new(
+		(int) Math.Round((point.X - camera.offset.X) / camera.zoom / Config.CellSize - 0.5f + maze.Width / 2.0f),
+		(int) Math.Round((point.Y - camera.offset.Y) / camera.zoom / Config.CellSize - 0.5f + maze.Height / 2.0f)
 	);
 	
 	public static void DrawTextRight(string text, int posX, int posY, int fontSize, Color color) =>

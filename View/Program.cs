@@ -17,6 +17,7 @@ var inputLocked = false;
 Reset(new(Config.InitialWidth, Config.InitialHeight), Config.StartWithMultiplayer, ref camera, ref inputLocked, 
 	out var maze, out var player1, out var player2, out var isMultiplayer);
 var random = new Random();
+var offset = new Vector2();
 
 #endregion
 
@@ -41,6 +42,10 @@ void Input()
 		player1.ChangeDirection();
 	if (IsKeyPressed(KeyboardKey.KEY_SLASH))
 		player2.ChangeDirection();
+	
+	camera.zoom += GetMouseWheelMove() * 0.1f;
+	if (IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT))
+		camera.offset = Config.WindowCenter + (offset += GetMouseDelta());
 }
 
 void Logic()
@@ -61,14 +66,13 @@ void Draw()
 	BeginDrawing();
 	BeginMode2D(camera);
 
-	
 	if (isMultiplayer)
 	{
-		maze.DrawPath(player1.Position, maze.ScreenToMaze(GetMousePosition()), players: new[] {player1, player2});
-		maze.DrawPath(player2.Position, maze.ScreenToMaze(GetMousePosition()), players: new[] {player1, player2});
+		maze.DrawPath(player1.Position, maze.ScreenToMaze(GetMousePosition(), camera), players: new[] {player1, player2});
+		maze.DrawPath(player2.Position, maze.ScreenToMaze(GetMousePosition(), camera), players: new[] {player1, player2});
 	}
 	else
-		maze.DrawPath(player1.Position, maze.ScreenToMaze(GetMousePosition()), players: player1);
+		maze.DrawPath(player1.Position, maze.ScreenToMaze(GetMousePosition(), camera), players: player1);
 
 	ClearBackground(Color.DARKGRAY);
 	maze.DrawMaze();
@@ -82,7 +86,7 @@ void Draw()
 	EndMode2D();
 
 	DrawText($"score: {player1.Score}", 32, 32, 40, Color.GREEN);
-	DrawText("wasd - move\nz - change direction\nr - reset\n-+ - change size\nm - toggle multiplayer", 32, 84, 20, Color.LIGHTGRAY);
+	DrawText("wasd - move\nz - change direction\nr - reset\n-+ - change size\nm - toggle multiplayer\nmouse - move and zoom", 32, 84, 20, Color.LIGHTGRAY);
 	if (isMultiplayer)
 	{
 		DrawTextRight($"score: {player2.Score}", 32, 32, 40, Color.BLUE);
