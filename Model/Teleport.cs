@@ -1,17 +1,13 @@
-using System.Drawing;
-using Color = Raylib_cs.Color;
+namespace prog_gmae.Model;
 
-public class Teleport
+public record Teleport(Point Position)
 {
 	private static readonly List<Color> colors = new()
 		{ Color.BEIGE, Color.DARKBLUE, Color.GOLD, Color.MAGENTA, Color.LIME };
 	public static readonly int MaxTeleports = colors.Count;
 
-	public Point Position { get; }
 	public Teleport? Link { get; private set; }
 	public Color Color { get; private set; }
-
-	public Teleport(Point position) => Position = position;
 
 	public void LinkTo(Teleport other, int i)
 	{
@@ -24,7 +20,7 @@ public class Teleport
 	{
 		if (Link == null || player.Contains(Link.Position))
 			return false;
-		player.Position = Link.Position;
+		// player.Position = Link.Position;
 		return true;
 	}
 }

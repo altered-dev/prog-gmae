@@ -1,18 +1,19 @@
-using System.Drawing;
+namespace prog_gmae.Model;
 
 public static class Generator
 {
-	public static Cell[,] GenerateMaze(int width, int height, bool isRandom = true)
+	public static Cell?[,] GenerateMaze(int width, int height, bool isRandom)
 	{
-		var cells = new Cell[width, height];
+		var cells = new Cell?[width, height];
 		var stack = new Stack<Cell>();
 		var random = new Random();
-		var x = random.Next(width);
-		var y = random.Next(height);
-		var current = cells[x, y] = new(x, y);
+		var current = new Cell(random.Next(width), random.Next(height));
+		cells[current.Position.X, current.Position.Y] = current;
 		var visited = new HashSet<Point>();
 		stack.Push(current);
-		var directions = Config.PossibleDirections.OrderBy(_ => random.Next()).ToList();
+		var directions = Config.PossibleDirections
+			.OrderBy(_ => random.Next())
+			.ToList();
 
 		for (var visitedCount = 0; visitedCount < width * height;)
 		{
@@ -47,15 +48,11 @@ public static class Generator
 				visitedCount++;
 			current = next;
 		}
-
 		return cells;
 	}
 
-	public static Collectible CreateCollectible(Point position)
-	{
-		var random = new Random();
-		if (random.Next(10) < 6)
-			return new GoodCollectible(position);
-		return new BadCollectible(position);
-	}
+	public static Collectible CreateCollectible(in Point position) => 
+		new Random().Next(10) < 6 
+			? new(position, -1, new(0, 0, 0, 125)) 
+			: new(position, 1, new(255, 255, 255, 125));
 }

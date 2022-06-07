@@ -1,9 +1,3 @@
-using System.Drawing;
-using Color = Raylib_cs.Color;
+namespace prog_gmae.Model;
 
-public interface Collectible
-{
-	public Point Position { get; }
-	public int TailLengthDelta { get; }
-	public Color SecondaryColor { get; }
-}
+public record Collectible(Point Position, int TailLengthDelta, Color SecondaryColor);

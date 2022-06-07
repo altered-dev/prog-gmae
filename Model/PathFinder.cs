@@ -1,13 +1,10 @@
-using System.Drawing;
+namespace prog_gmae.Model;
 
 public static class PathFinder
 {
-	private static readonly Size[] directions = 
-		{ new(-1, 0), new(0, -1), new(1, 0), new(0, 1) };
-
 	private static IEnumerable<Size> GetDirections(this Maze maze, Point point) => 
 		Config.PossibleDirections
-			.Where(dir => (maze[point].Connections & new Point(dir).ToDirection()) != 0);
+			.Where(dir => (maze[point]?.Connections & new Point(dir).ToDirection()) != 0);
 
 	public static List<Size>? FindPath(this Maze maze, Point from, Point to, 
 		bool ignoreEnemies = false, bool cosmetic = false, params Player[] players)
@@ -29,9 +26,10 @@ public static class PathFinder
 				else
 					link.Value = point = tp.Link!.Position;
 			}
-			if (!point.IsInBounds(maze.Width, maze.Height) || visited.Contains(point)
-				|| players.Any(p => p.Contains(point))
-				|| (!ignoreEnemies && maze.Enemies.Any(e => e.Position == point)))
+			if (!point.IsInBounds(maze.Width, maze.Height) 
+			    || visited.Contains(point)
+			    || players.Any(p => p.Contains(point))
+			    || (!ignoreEnemies && maze.Enemies.Any(e => e.Position == point)))
 				continue;
 			if (point == to)
 			{
@@ -45,21 +43,14 @@ public static class PathFinder
 		return null;
 	}
 
-	private class Link<T>
+	private record Link<T>(T Value, Link<T>? Previous = null)
 	{
-		public T Value { get; set; }
-		public Link<T>? Previous { get; }
-
-		public Link(T value, Link<T>? previous = null)
-		{
-			Value = value;
-			Previous = previous;
-		}
+		public T Value { get; set; } = Value;
 
 		public List<T> ToList()
 		{
 			var list = new LinkedList<T>();
-			Link<T>? current = this;
+			var current = this;
 			while (current != null)
 			{
 				list.AddFirst(current.Value);

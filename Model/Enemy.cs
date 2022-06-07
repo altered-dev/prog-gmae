@@ -1,23 +1,14 @@
-using System.Drawing;
-using Color = Raylib_cs.Color;
+namespace prog_gmae.Model;
 
-public class Enemy
+public record Enemy(Point Position, Color Color) : IMovable
 {
-	public Point Position { get; set; }
-	public Color Color { get; set; }
-
-	public Enemy(Point position, Color color)
-	{
-		Position = position;
-		Color = color;
-	}
+	public Point Position { get; set; } = Position;
 
 	public void MoveTowards(Maze maze, params Player[] players)
 	{
 		var path = players
 			.Select(player => maze.FindPath(Position, player.Position, true))
-			.OrderBy(path => path?.Count ?? int.MaxValue)
-			.FirstOrDefault();
+			.MinBy(path => path?.Count ?? int.MaxValue);
 		if (path == null)
 			return;
 		var newPos = Position + path.FirstOrDefault();
@@ -30,7 +21,7 @@ public class Enemy
 		if (collectible != null)
 		{
 			maze.Collectibles.Remove(collectible);
-			maze.AddCollectible(players);
+			maze.AddCollectible();
 		}
 		Position = newPos;
 	}

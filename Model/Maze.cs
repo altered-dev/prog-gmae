@@ -1,76 +1,69 @@
-using System.Drawing;
+namespace prog_gmae.Model;
 
 public class Maze
 {
 	public readonly int Width, Height;
-	public int Score { get; private set; }
-
-	private readonly Cell[,] cells;
 	public readonly List<Teleport> Teleports = new();
-	public readonly List<Collectible> Collectibles = new();
-	public readonly List<Enemy> Enemies = new();
+	public readonly List<Collectible> Collectibles;
+	public readonly List<Enemy> Enemies;
+	public readonly List<Player> Players;
+	private readonly Cell?[,] cells;
 
 	private static readonly Random random = new();
 
-	public Maze(int width, int height, int collectibleCount, int teleportCount, int enemyCount)
+	public Maze(int width, int height, int playerCount, int collectibleCount, int teleportCount, int enemyCount)
 	{
 		Width = width < 1 ? 1 : width;
 		Height = height < 1 ? 1 : height;
 		cells = Generator.GenerateMaze(Width, Height, Config.RandomMaze);
-		for (var i = 0; i < collectibleCount; i++)
-			AddCollectible();
 		for (var i = 0; i < teleportCount; i++)
 			AddTeleports(i);
-		// for (var i = 0; i < random.Next(Width, Width * 4); i++)
-		// 	RemoveWall(GetRandomFreePoint(), Direction.Down);
-		// for (var i = 0; i < random.Next(Height, Height * 4); i++)
-		// 	RemoveWall(GetRandomFreePoint(), Direction.Right);
-		for (var i = 0; i < enemyCount; i++)
-			AddEnemy();
+		Players = Config.PlayerProperties
+			.Take(playerCount)
+			.Select(properties => new Player(GetRandomFreePoint(), properties.color,
+				properties.walkDirections, properties.changeDirectionKey))
+			.ToList();
+		Collectibles = collectibleCount
+			.Repeat(_ => Generator.CreateCollectible(GetRandomFreePoint()))
+			.ToList();
+		Enemies = enemyCount
+			.Repeat(_ => new Enemy(GetRandomFreePoint(), Color.RED))
+			.ToList();
 	}
 
-	public Cell this[int x, int y]
+	public Cell? this[int x, int y]
 	{
 		get => cells[x, y];
 		set => cells[x, y] = value;
 	}
 
-	public Cell this[Point pos]
+	public Cell? this[Point pos]
 	{
 		get => cells[pos.X, pos.Y];
 		set => cells[pos.X, pos.Y] = value;
 	}
 
-	public bool IsCellOccupied(Point position, params Player[] players) => 
+	public bool IsCellOccupied(Point position) => 
 		this[position] == null ||
-		players.Any(player => player.Contains(position)) ||
+		Players.Any(player => player.Contains(position)) ||
 		Collectibles.Any(c => c.Position == position) ||
 		Teleports.Any(t => t.Position == position) ||
 		Enemies.Any(e => e.Position == position);
 
-	public Point GetRandomFreePoint(params Player[] players)
+	public Point GetRandomFreePoint()
 	{
 		Point result;
 		do result = new(random.Next(Width), random.Next(Height));
-		while (IsCellOccupied(result, players));
+		while (IsCellOccupied(result));
 		return result;
 	}
 
-	public void AddCollectible(params Player[] players) => 
-		Collectibles.Add(Generator.CreateCollectible(GetRandomFreePoint(players)));
+	public void AddCollectible() => 
+		Collectibles.Add(Generator.CreateCollectible(GetRandomFreePoint()));
 
 	private void AddTeleports(int i)
 	{
-		var teleportA = new Teleport(GetRandomFreePoint());
-		var teleportB = new Teleport(GetRandomFreePoint());
-		Teleports.Add(teleportA);
-		Teleports.Add(teleportB);
-		teleportA.LinkTo(teleportB, i);
-	}
 
-	private void AddEnemy()
-	{
-		Enemies.Add(new(GetRandomFreePoint(), Raylib_cs.Color.RED));
 	}
 
 	public void TryCollect(params Player[] players)
@@ -80,9 +73,8 @@ public class Maze
 			var collectible = Collectibles.Find(c => c.Position == player.Position);
 			if (collectible == null)
 				continue;
-
 			Collectibles.Remove(collectible);
-			AddCollectible(players);
+			AddCollectible();
 			player.Score += 1;
 			player.TailLength += collectible.TailLengthDelta;
 		}
@@ -93,8 +85,8 @@ public class Maze
 		var newPos = position + direction.ToCoords();
 		if (!newPos.IsInBounds(Width, Height))
 			return;
-		this[position].Connections &= ~direction;
-		this[newPos].Connections &= ~direction.Reverse();
+		this[position]!.Connections &= ~direction;
+		this[newPos]!.Connections &= ~direction.Reverse();
 	}
 
 	public void RemoveWall(Point position, Direction direction)
@@ -102,12 +94,12 @@ public class Maze
 		var newPos = position + direction.ToCoords();
 		if (!newPos.IsInBounds(Width, Height))
 			return;
-		this[position].Connections |= direction;
+		this[position]!.Connections |= direction;
 		this[newPos] ??= new(newPos);
-		this[newPos].Connections |= direction.Reverse();
+		this[newPos]!.Connections |= direction.Reverse();
 	}
 
-	public bool TryTeleportPlayer(Player player) => Teleports
+	public void TryTeleportPlayer(Player player) => Teleports
 		.Find(t => t.Position == player.Position)?
-		.MovePlayer(player) ?? false;
+		.MovePlayer(player);
 }

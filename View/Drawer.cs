@@ -1,8 +1,7 @@
-using System.Numerics;
-using Raylib_cs;
+using prog_gmae.Model;
 using static Raylib_cs.Raylib;
-using System.Drawing;
-using Color = Raylib_cs.Color;
+
+namespace prog_gmae.View;
 
 public static class Drawer
 {
@@ -42,12 +41,10 @@ public static class Drawer
 
 	public static void DrawPlayer(this Maze maze, Player player)
 	{
-		var random = new Random();
 		var i = 0;
 		var size = Config.CellSize / 3;
-		foreach (var point in player.Tail.Select(p => maze.MazeToScreenV(p)))
-			DrawCircleV(point, size - (i++ * 5) / player.Tail.Count, player.Color);
-
+		foreach (var point in player.Tail.Select(maze.MazeToScreenV))
+			DrawCircleV(point, size - i++ * 5 / player.Tail.Count, player.Color);
 		
 		var pos = maze.MazeToScreenV(player.Position);
 		DrawCircleV(pos, Config.CellSize / 2 - 4, player.Color);
@@ -92,12 +89,12 @@ public static class Drawer
 	}
 
 	public static Point MazeToScreen(this Maze maze, Point position) => new(
-		(int)((position.X - (maze.Width / 2.0f) + 0.5f) * Config.CellSize), 
-		(int)((position.Y - (maze.Height / 2.0f) + 0.5f) * Config.CellSize));
+		(int)((position.X - maze.Width / 2.0f + 0.5f) * Config.CellSize), 
+		(int)((position.Y - maze.Height / 2.0f + 0.5f) * Config.CellSize));
 
 	public static Vector2 MazeToScreenV(this Maze maze, Point position) => new(
-		(position.X - (maze.Width / 2.0f) + 0.5f) * Config.CellSize, 
-		(position.Y - (maze.Height / 2.0f) + 0.5f) * Config.CellSize);
+		(position.X - maze.Width / 2.0f + 0.5f) * Config.CellSize, 
+		(position.Y - maze.Height / 2.0f + 0.5f) * Config.CellSize);
 	
 	public static Point ScreenToMaze(this Maze maze, Vector2 point, Camera2D camera) => new(
 		(int) Math.Round((point.X - camera.offset.X) / camera.zoom / Config.CellSize - 0.5f + maze.Width / 2.0f),

@@ -1,6 +1,4 @@
-using System.Numerics;
-using Raylib_cs;
-using System.Drawing;
+namespace prog_gmae.Model;
 
 public static class Config
 {
@@ -23,12 +21,31 @@ public static class Config
 	public static readonly List<Size> PossibleDirections = new()
 		{ new(1, 0), new(0, -1), new(-1, 0), new(0, 1) };
 
+	public static readonly (Dictionary<KeyboardKey, Direction> walkDirections, 
+		KeyboardKey changeDirectionKey, Color color)[] PlayerProperties =
+	{
+		(new()
+		{
+			[KeyboardKey.KEY_D] = Direction.Right,
+			[KeyboardKey.KEY_W] = Direction.Up,
+			[KeyboardKey.KEY_A] = Direction.Left,
+			[KeyboardKey.KEY_S] = Direction.Down,
+		}, KeyboardKey.KEY_Z, Color.GREEN),
+		(new()
+		{
+			[KeyboardKey.KEY_RIGHT] = Direction.Right,
+			[KeyboardKey.KEY_UP] = Direction.Up,
+			[KeyboardKey.KEY_LEFT] = Direction.Left,
+			[KeyboardKey.KEY_DOWN] = Direction.Down,
+		}, KeyboardKey.KEY_SLASH, Color.BLUE),
+	};
+
 	public static readonly Dictionary<KeyboardKey, Direction> Player1WalkDirections = new()
 	{
 		[KeyboardKey.KEY_D] = Direction.Right,
 		[KeyboardKey.KEY_W] = Direction.Up,
 		[KeyboardKey.KEY_A] = Direction.Left,
-		[KeyboardKey.KEY_S] = Direction.Down
+		[KeyboardKey.KEY_S] = Direction.Down,
 	};
 
 	public static readonly Dictionary<KeyboardKey, Direction> Player2WalkDirections = new()
@@ -36,7 +53,7 @@ public static class Config
 		[KeyboardKey.KEY_RIGHT] = Direction.Right,
 		[KeyboardKey.KEY_UP] = Direction.Up,
 		[KeyboardKey.KEY_LEFT] = Direction.Left,
-		[KeyboardKey.KEY_DOWN] = Direction.Down
+		[KeyboardKey.KEY_DOWN] = Direction.Down,
 	};
 
 	public static readonly Dictionary<KeyboardKey, Size> ResetDirections = new()

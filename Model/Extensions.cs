@@ -1,5 +1,4 @@
-using System.Drawing;
-using Raylib_cs;
+namespace prog_gmae.Model;
 
 public static class Extensions
 {
@@ -65,4 +64,16 @@ public static class Extensions
 	public static bool IsInBounds(this Point point, int width, int height) =>
 		0 <= point.X && point.X < width &&
 		0 <= point.Y && point.Y < height;
+
+	public static IEnumerable<T> Repeat<T>(this int count, Func<int, T> selector)
+	{
+		for (var i = 0; i < count; i++)
+			yield return selector(i);
+	}
+
+	public static IEnumerable<T> Repeat<T>(this int count, Func<T> selector)
+	{
+		for (var _ = 0; _ < count; _++)
+			yield return selector();
+	}
 }
